@@ -1,0 +1,43 @@
+# --- General ---
+# OS, IDE, tooling artefacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+
+# --- Node / Front-end ---
+node_modules/
+# Output directories
+build/
+dist/
+clipx/.next/
+clipx/out/
+
+# --- Environment / Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Test / Coverage ---
+.coverage
+htmlcov/
+coverage.xml
+
+# --- Compiled / Packaging ---
+*.egg-info/
+*.egg
+*.whl
+
+# --- Misc ---
+redis/*.zip

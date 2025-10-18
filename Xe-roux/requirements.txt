@@ -1,0 +1,11 @@
+fastapi>=0.115
+uvicorn[standard]
+yt-dlp
+aiofiles
+python-multipart
+pydantic>=2
+celery[redis]>=5.3
+aioredis
+python-dotenv
+fastapi-limiter>=0.1.5
+boto3>=1.26

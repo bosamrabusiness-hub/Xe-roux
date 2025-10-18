@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 220 50% 15%;
+    --background-gradient-start: 220 50% 15%;
+    --background-gradient-end: 180 50% 30%;
+    --foreground: 180 100% 95%;
+
+    --card: 220 40% 20%;
+    --card-glass: 220 40% 20% / 0.4;
+    --card-foreground: 180 100% 95%;
+
+    --popover: 220 40% 20%;
+    --popover-foreground: 180 100% 95%;
+
+    --primary: 162 73% 67%;
+    --primary-glow: 162 100% 50%;
+    --primary-foreground: 220 50% 15%;
+
+    --secondary: 180 50% 40%;
+    --secondary-foreground: 180 100% 95%;
+
+    --muted: 220 30% 25%;
+    --muted-foreground: 180 20% 70%;
+
+    --accent: 162 73% 67%;
+    --accent-foreground: 220 50% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 180 30% 35%;
+    --input: 220 40% 25%;
+    --ring: 162 73% 67%;
+
+    --radius: 1.25rem;
+
+    --shadow-glow: 0 0 20px hsl(162 100% 50% / 0.3);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.3);
+  }
+
+  .dark {
+    --background: 220 50% 15%;
+    --background-gradient-start: 220 50% 15%;
+    --background-gradient-end: 180 50% 30%;
+    --foreground: 180 100% 95%;
+
+    --card: 220 40% 20%;
+    --card-glass: 220 40% 20% / 0.4;
+    --card-foreground: 180 100% 95%;
+
+    --popover: 220 40% 20%;
+    --popover-foreground: 180 100% 95%;
+
+    --primary: 162 73% 67%;
+    --primary-glow: 162 100% 50%;
+    --primary-foreground: 220 50% 15%;
+
+    --secondary: 180 50% 40%;
+    --secondary-foreground: 180 100% 95%;
+
+    --muted: 220 30% 25%;
+    --muted-foreground: 180 20% 70%;
+
+    --accent: 162 73% 67%;
+    --accent-foreground: 220 50% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 180 30% 35%;
+    --input: 220 40% 25%;
+    --ring: 162 73% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-[hsl(var(--background-gradient-start))] to-[hsl(var(--background-gradient-end))] text-foreground min-h-screen;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .neon-glow {
+    box-shadow: 0 0 20px hsl(var(--primary-glow) / 0.3),
+                0 0 40px hsl(var(--primary-glow) / 0.2);
+  }
+
+  .neon-glow-hover:hover {
+    box-shadow: 0 0 30px hsl(var(--primary-glow) / 0.5),
+                0 0 60px hsl(var(--primary-glow) / 0.3);
+  }
+}

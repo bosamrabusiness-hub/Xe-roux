@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+# Add other libs your routes depend on

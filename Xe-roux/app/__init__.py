@@ -1,0 +1,1 @@
+"""ClipX FastAPI backend package."""
