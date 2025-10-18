@@ -3,6 +3,8 @@ import { Link2, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { FaYoutube, FaFacebookF, FaTiktok, FaInstagram, FaVimeoV } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 interface PasteBarProps {
   onUrlSubmit: (url: string) => void;
@@ -121,9 +123,14 @@ export const PasteBar = ({ onUrlSubmit, isLoading }: PasteBarProps) => {
         </div>
       </form>
       
-      <p className="text-center text-muted-foreground text-sm mt-4">
-        Supports YouTube, Facebook, TikTok, Instagram, Twitter, Vimeo
-      </p>
+      <div className="flex justify-center gap-6 text-muted-foreground text-2xl mt-4">
+        {[FaYoutube, FaFacebookF, FaTiktok, FaInstagram, FaXTwitter, FaVimeoV].map((Icon, idx) => (
+          <Icon
+            key={idx}
+            className="cursor-pointer transition-transform duration-300 hover:scale-125 hover:text-primary"
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -1,9 +1,30 @@
 import { Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
+
+  // Theme state persisted in localStorage
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("theme") === "dark";
+  });
+
+  // Apply or remove the `dark` class on the <html> element
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDark]);
+
+  const toggleTheme = () => setIsDark((prev) => !prev);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -11,7 +32,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="glass-effect border-b border-border/50 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between relative">
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center neon-glow-hover transition-all duration-300">
               <span className="text-2xl font-bold text-primary-foreground">X</span>
@@ -21,7 +42,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1">
+          {/* Centered Navigation */}
+          <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
@@ -34,19 +56,22 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               variant="ghost"
               size="sm"
               asChild
-              className={isActive("/history") ? "bg-primary/20 text-primary" : ""}
-            >
-              <Link to="/history">History</Link>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
               className={isActive("/about") ? "bg-primary/20 text-primary" : ""}
             >
               <Link to="/about">About</Link>
             </Button>
           </nav>
+
+          {/* Theme Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="ml-2"
+            aria-label="Toggle Theme"
+          >
+            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
         </div>
       </header>
 
