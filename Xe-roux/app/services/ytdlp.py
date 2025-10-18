@@ -107,6 +107,16 @@ async def _run_cmd_with_progress(cmd: List[str], progress_callback=None) -> str:
                     if not line:
                         break
                     stdout_lines.append(line)
+                    # NEW: Also parse progress information from stdout (some systems emit progress here)
+                    if progress_callback and "[download]" in line:
+                        percent_match = re.search(r'(\d+(?:\.\d+)?)%', line)
+                        if percent_match:
+                            try:
+                                percent = float(percent_match.group(1))
+                                progress_queue.put(percent)
+                                progress_callback(percent)
+                            except Exception as e:
+                                print(f"DEBUG: Error parsing percentage from stdout: {e}")  # Debug log
             except Exception:
                 pass
             
@@ -300,36 +310,68 @@ async def fetch_preview(url: str) -> Dict[str, Any]:
 
 
 async def download_with_progress(url: str, format_id: str, output_path: str, progress_callback=None) -> str:
-    """Download video with progress tracking."""
-    # Map generic format ids (like 'mp4', 'mp3') to proper yt-dlp selectors
-    if format_id.lower() in {"mp4"}:
-        # Prefer highest quality video + audio merged, falling back to best single file of that ext
-        mapped_format = f"bestvideo[ext={format_id}]+bestaudio[ext=m4a]/best[ext={format_id}]/best"
-        format_id_arg = mapped_format
-    elif format_id.lower() == "mp3":
-        # We'll download bestaudio then extract to mp3
-        format_id_arg = "bestaudio"
-    else:
-        format_id_arg = format_id
-    
-    cmd = [
-        "yt-dlp",
-        "-f",
-        format_id_arg,
-    ]
-    
-    # Extra flags for mp3 conversion
-    if format_id.lower() == "mp3":
-        cmd += ["-x", "--audio-format", "mp3"]
-    
-    cmd += [
-        "-o",
-        output_path,
-        url,
-    ]
-    
-    # original code below replaced
-    if progress_callback:
-        return await _run_cmd_with_progress(cmd, progress_callback)
-    else:
-        return await _run_cmd(cmd)
+    """Download video with progress tracking. Uses python yt_dlp for precise progress if available."""
+    try:
+        import yt_dlp  # type: ignore
+
+        # Build format string mapping similar to previous logic
+        if format_id.lower() == "mp4":
+            mapped_format = f"bestvideo[ext={format_id}]+bestaudio[ext=m4a]/best[ext={format_id}]/best"
+            final_format = mapped_format
+        elif format_id.lower() == "mp3":
+            final_format = "bestaudio"
+        else:
+            final_format = format_id
+
+        def _hook(d: dict):
+            if d.get("status") == "downloading":
+                total = d.get("total_bytes") or d.get("total_bytes_estimate")
+                downloaded = d.get("downloaded_bytes", 0)
+                if total:
+                    percent = downloaded / total * 100
+                    if progress_callback:
+                        try:
+                            progress_callback(percent)
+                        except Exception:
+                            pass
+        ydl_opts = {
+            "format": final_format,
+            "outtmpl": output_path,
+            "progress_hooks": [_hook],
+            # Suppress additional output – we manage our own logging/progress
+            "noprogress": True,
+            "quiet": True,
+        }
+        # Run in thread executor to avoid blocking event loop
+        import asyncio, functools
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, lambda: yt_dlp.YoutubeDL(ydl_opts).download([url]))
+        return output_path
+    except ImportError:
+        # Fallback to CLI method
+        if format_id.lower() in {"mp4"}:
+            mapped_format = f"bestvideo[ext={format_id}]+bestaudio[ext=m4a]/best[ext={format_id}]/best"
+            format_id_arg = mapped_format
+        elif format_id.lower() == "mp3":
+            format_id_arg = "bestaudio"
+        else:
+            format_id_arg = format_id
+
+        cmd = [
+            "yt-dlp",
+            "-f",
+            format_id_arg,
+        ]
+
+        if format_id.lower() == "mp3":
+            cmd += ["-x", "--audio-format", "mp3"]
+
+        cmd += [
+            "-o",
+            output_path,
+            url,
+        ]
+        if progress_callback:
+            return await _run_cmd_with_progress(cmd, progress_callback)
+        else:
+            return await _run_cmd(cmd)

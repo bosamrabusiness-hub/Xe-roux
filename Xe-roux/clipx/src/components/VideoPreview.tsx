@@ -299,7 +299,7 @@ export const VideoPreview = ({ videoUrl, onLoadEnd }: VideoPreviewProps) => {
              {downloading ? (
                <>
                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                 Downloading...
+                 {`Downloading... ${Math.floor(progress)}%`}
                </>
              ) : (
                <>
